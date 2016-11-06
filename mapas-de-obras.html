@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Palp BR</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+
+    <!-- Custom styles for this template -->
+    <link href="css/style.css" rel="stylesheet">
+    
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+    <header>
+      <nav class="navbar navbar-default navbar-inverse">
+        <div class="container-fluid">
+          <!-- Brand and toggle get grouped for better mobile display -->
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="index.html"><img alt="Brand" src="images/nexos_logo.png"></a>
+          </div>
+
+          <!-- Collect the nav links, forms, and other content for toggling -->
+          <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+              <li><a href="mapas-de-obras.html">Mapas de obras</a></li>
+              <li><a href="#">Fale conosco</a></li>
+            </ul>
+          </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+      </nav>
+    </header>
+    
+    <main>
+      <div class="container main">
+          <h2>Mapas de obras</h2>
+          <p>Abaixo você encontra um mapa que indica em quais locais estão sendo realizadas obras nos ícones azuis, e quais as obras finalizadas até um ano, nos ícones verdes. Ao clicar no ícone da obra, é possível verificar mais detalhes, como o valor do contrato, empresa responsável pela obra, e muito mais.</p>
+          
+          <input id="pac-input" class="controls" type="text" placeholder="Busque uma localização">
+          <div id="map"></div>
+          
+          <div class="panel panel-default">
+            <div class="panel-heading">Legendas</div>
+            <div class="panel-body">
+              <ul>
+                <li><img src="images/icone1.png" alt=""><p class="inline"> - Reforma (Verde - Finalizada, Azul - Andamento)</p></li>
+                <li><img src="images/icone2.png" alt=""><p class="inline"> - Revitalização (Verde - Finalizada, Azul - Andamento)</p></li>
+              </ul>
+            </div>
+          </div>
+      </div>
+    </main>
+    
+    <footer id="footer" class="">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-3 widget">
+                    <h3 class="widget-title">Contato</h3>
+                    <div class="widget-body">
+                        <p>(11)99999-9999<br>
+                            <a href="mailto:exemplo@gmail.com">exemplo@gmail.com</a><br>
+                            Rua de Exemplo, 222<br>
+                            São Paulo - SP
+                        </p>	
+                    </div>
+                </div>
+
+                <div class="col-sm-offset-6 col-sm-3 widget">
+                    <h3 class="widget-title">Redes Sociais</h3>
+                    <div class="widget-body">
+                        <p class="follow-me-icons">
+                            <a href=""><i class="fa fa-twitter fa-2"></i></a>
+                            <a href=""><i class="fa fa-dribbble fa-2"></i></a>
+                            <a href=""><i class="fa fa-github fa-2"></i></a>
+                            <a href=""><i class="fa fa-facebook fa-2"></i></a>
+                        </p>
+                    </div>
+                </div>
+
+            </div> <!-- /row of widgets -->
+        </div>
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+      function initMap() {
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 15,
+          center: {lat: -23.6512564, lng: -46.7310542}
+        });
+
+        setMarkers(map);
+        
+        // search box
+        // Create the search box and link it to the UI element.
+        var input = document.getElementById('pac-input');
+        var searchBox = new google.maps.places.SearchBox(input);
+        map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+
+        // Bias the SearchBox results towards current map's viewport.
+        map.addListener('bounds_changed', function() {
+          searchBox.setBounds(map.getBounds());
+        });
+        // Listen for the event fired when the user selects a prediction and retrieve
+        // more details for that place.
+        searchBox.addListener('places_changed', function() {
+          var places = searchBox.getPlaces();
+          
+          if (places.length == 0) {
+            return;
+          }
+          var bounds = new google.maps.LatLngBounds();
+          places.forEach(function(place) {
+            var icon = {
+              url: place.icon,
+              size: new google.maps.Size(71, 71),
+              origin: new google.maps.Point(0, 0),
+              anchor: new google.maps.Point(17, 34),
+              scaledSize: new google.maps.Size(25, 25)
+            };
+            if (place.geometry.viewport) {
+              // Only geocodes have viewport.
+              bounds.union(place.geometry.viewport);
+            } else {
+              bounds.extend(place.geometry.location);
+            }
+          });
+          map.fitBounds(bounds);
+        });
+      }
+
+      // Data for the markers consisting of a name, a LatLng and a zIndex for the
+      // order in which these markers should display on top of each other.
+      var data = [
+        ['COBERTURA DE QUADRA E INSTALAÇÕES DE VESTIARIOS', -23.6512564, -46.7310542, 4, 'Rua GUIMARÃES TAVARES X RUA JOSÉ GOMES CARDIN - JD. NAGIB SALEM - Distrito do Jardim São Luis - São Paulo - SP', '403.348,14', 'MAFEN ENGENHARIA E CONSTRUÇÕES LTDA', 'obra1.html', 'M38.384,420.339l-28.41,91.79h39.445l31.556-91.418l9.008-71.145h30.055l27.043,73.727l-16.524,88.836h38.279    l18.819-100.616l-18.819-53.034l-6.837-23.992l103.562,58.676l-19.431,33.736l45.125,26l47.735-82.858l-45.125-26.001    l-18.752,32.551L154.53,308.276l-6.502-22.835l11.829-47.918l5.097,43.797l8.186,21.257l32.302,18.886l-13.397-47.602    l-10.356-91.456l-33.469-1.377l-5.881-16.18c22.424-4.581,39.302-23.906,40.545-47.373l-100.75-13.359    c-0.736,3.442-1.157,7.009-1.157,10.672c0,17.681,8.989,33.258,22.644,42.429l-0.889-0.096l-20.167,16.954l-25.838-2.17L0,221.497    v75.477l45.059,11.131L38.384,420.339z M28.688,269.558v-22.539l19.125-17.471v44.313L28.688,269.558z M182.443,107.77l15.31,2.027c2.037-45.508-17.738-75.286-53.541-80.029c-2.936-0.392-5.843-0.583-8.721-0.583    c-31.709,0-54.784,23.208-63.82,63.896l13.34,1.769L182.443,107.77z', 'blue'],
+        ['SAGUÃO HOSPITAL HSPM', -23.5668044, -46.6414441, 5, 'R. Castro Alves, 60 - Aclimação, São Paulo - SP, 01532-000', '336.060,26', 'S.E.C. - SOCIEDADE DE ENGENHARIA E CONSTRUÇÃO LTDA', 'obra2.html', 'M38.384,420.339l-28.41,91.79h39.445l31.556-91.418l9.008-71.145h30.055l27.043,73.727l-16.524,88.836h38.279    l18.819-100.616l-18.819-53.034l-6.837-23.992l103.562,58.676l-19.431,33.736l45.125,26l47.735-82.858l-45.125-26.001    l-18.752,32.551L154.53,308.276l-6.502-22.835l11.829-47.918l5.097,43.797l8.186,21.257l32.302,18.886l-13.397-47.602    l-10.356-91.456l-33.469-1.377l-5.881-16.18c22.424-4.581,39.302-23.906,40.545-47.373l-100.75-13.359    c-0.736,3.442-1.157,7.009-1.157,10.672c0,17.681,8.989,33.258,22.644,42.429l-0.889-0.096l-20.167,16.954l-25.838-2.17L0,221.497    v75.477l45.059,11.131L38.384,420.339z M28.688,269.558v-22.539l19.125-17.471v44.313L28.688,269.558z M182.443,107.77l15.31,2.027c2.037-45.508-17.738-75.286-53.541-80.029c-2.936-0.392-5.843-0.583-8.721-0.583    c-31.709,0-54.784,23.208-63.82,63.896l13.34,1.769L182.443,107.77z', 'blue'],
+        ['REVITALIZAÇÃO DE TRAVESSIA DE PEDESTRES', -23.726596, -46.7885159, 3, 'Estrada do M?Boi Mirim, nº 9.788 - Jardim Capela - São Paulo - SP', '146.915,42', 'MAFEN ENGENHARIA E CONSTRUÇÕES LTDA', 'obra3.html', 'M504.204,7.797c-7.07-7.069-17.376-9.565-26.895-6.521L102.439,121.244c-8.9,2.849-15.528,9.97-17.729,19.052    c-2.201,9.082,0.428,18.449,7.036,25.056L199.763,273.37l-49.008,49.01l-6.293-6.293c-3.984-3.982-10.441-3.982-14.426,0    L13.621,432.5c-18.162,18.163-18.162,47.715,0,65.879C22.703,507.46,34.633,512,46.561,512c11.929,0,23.859-4.54,32.94-13.621    l116.415-116.415c3.983-3.983,3.983-10.442,0-14.426l-6.293-6.293l49.009-49.009l108.017,108.017    c5.071,5.071,11.766,7.799,18.712,7.799c2.104,0,4.233-0.251,6.345-0.763c9.081-2.201,16.204-8.829,19.052-17.729L510.724,34.692    C513.77,25.172,511.272,14.866,504.204,7.797z M65.076,483.954c-10.207,10.21-26.82,10.209-37.029,0    c-10.209-10.209-10.209-26.821,0-37.029L137.25,337.723l37.029,37.029L65.076,483.954z M175.196,346.819l-10.015-10.015    l110.488-110.487c2.76-2.761,7.253-2.761,10.015,0c2.762,2.761,2.762,7.254,0,10.015L175.196,346.819z M491.295,28.475    L371.327,403.343c-0.955,2.982-3.416,3.876-4.429,4.122c-1.017,0.247-3.611,0.577-5.825-1.636L253.056,297.812l47.054-47.054    c10.715-10.716,10.715-28.151,0-38.866s-28.15-10.717-38.866,0l-47.054,47.054L106.173,150.929    c-2.214-2.214-1.882-4.811-1.636-5.825c0.246-1.013,1.139-3.474,4.122-4.429L483.526,20.707c3.236-1.039,5.453,0.715,6.253,1.516    C490.58,23.023,492.33,25.237,491.295,28.475z M357.635,87.6c-1.722-5.363-7.463-8.318-12.828-6.598l-5.786,1.855c-5.364,1.721-8.318,7.463-6.598,12.827    c1.388,4.329,5.396,7.088,9.711,7.088c1.031,0,2.082-0.158,3.117-0.49l5.786-1.855C356.401,98.707,359.355,92.964,357.635,87.6z M320.599,99.475c-1.72-5.364-7.461-8.32-12.827-6.599l-163.189,52.32c-5.365,1.721-8.319,7.462-6.599,12.826    c1.387,4.33,5.396,7.089,9.711,7.089c1.031,0,2.081-0.158,3.116-0.49L314,112.301C319.365,110.58,322.319,104.839,320.599,99.475z    ', 'green'],
+        ['REVITALIZAÇÃO DE PRAÇAS', -23.6670626, -46.7604923, 2, 'Pça Heidi Alves Lazzarini na Rua Macari Grande x Rua Agamenon Pereira da Silva, Jardim Nakamura, São Paulo SP', '48.361,81', 'ESCOPO CONSTRUTORA LTDA', 'obra4.html', 'M504.204,7.797c-7.07-7.069-17.376-9.565-26.895-6.521L102.439,121.244c-8.9,2.849-15.528,9.97-17.729,19.052    c-2.201,9.082,0.428,18.449,7.036,25.056L199.763,273.37l-49.008,49.01l-6.293-6.293c-3.984-3.982-10.441-3.982-14.426,0    L13.621,432.5c-18.162,18.163-18.162,47.715,0,65.879C22.703,507.46,34.633,512,46.561,512c11.929,0,23.859-4.54,32.94-13.621    l116.415-116.415c3.983-3.983,3.983-10.442,0-14.426l-6.293-6.293l49.009-49.009l108.017,108.017    c5.071,5.071,11.766,7.799,18.712,7.799c2.104,0,4.233-0.251,6.345-0.763c9.081-2.201,16.204-8.829,19.052-17.729L510.724,34.692    C513.77,25.172,511.272,14.866,504.204,7.797z M65.076,483.954c-10.207,10.21-26.82,10.209-37.029,0    c-10.209-10.209-10.209-26.821,0-37.029L137.25,337.723l37.029,37.029L65.076,483.954z M175.196,346.819l-10.015-10.015    l110.488-110.487c2.76-2.761,7.253-2.761,10.015,0c2.762,2.761,2.762,7.254,0,10.015L175.196,346.819z M491.295,28.475    L371.327,403.343c-0.955,2.982-3.416,3.876-4.429,4.122c-1.017,0.247-3.611,0.577-5.825-1.636L253.056,297.812l47.054-47.054    c10.715-10.716,10.715-28.151,0-38.866s-28.15-10.717-38.866,0l-47.054,47.054L106.173,150.929    c-2.214-2.214-1.882-4.811-1.636-5.825c0.246-1.013,1.139-3.474,4.122-4.429L483.526,20.707c3.236-1.039,5.453,0.715,6.253,1.516    C490.58,23.023,492.33,25.237,491.295,28.475z M357.635,87.6c-1.722-5.363-7.463-8.318-12.828-6.598l-5.786,1.855c-5.364,1.721-8.318,7.463-6.598,12.827    c1.388,4.329,5.396,7.088,9.711,7.088c1.031,0,2.082-0.158,3.117-0.49l5.786-1.855C356.401,98.707,359.355,92.964,357.635,87.6z M320.599,99.475c-1.72-5.364-7.461-8.32-12.827-6.599l-163.189,52.32c-5.365,1.721-8.319,7.462-6.599,12.826    c1.387,4.33,5.396,7.089,9.711,7.089c1.031,0,2.081-0.158,3.116-0.49L314,112.301C319.365,110.58,322.319,104.839,320.599,99.475z    ', 'blue'],
+        ['ACESSIBILIDADE', -23.6798367, -46.7637447, 1, 'Rua Reinaldo Pereira, 01 - Jardim Coimbra - São Paulo - SP', '290.656,55', 'MACOR ENGENHARIA CONSTRUÇÕES E COMERCIO LTDA', 'obra5.html', 'M38.384,420.339l-28.41,91.79h39.445l31.556-91.418l9.008-71.145h30.055l27.043,73.727l-16.524,88.836h38.279    l18.819-100.616l-18.819-53.034l-6.837-23.992l103.562,58.676l-19.431,33.736l45.125,26l47.735-82.858l-45.125-26.001    l-18.752,32.551L154.53,308.276l-6.502-22.835l11.829-47.918l5.097,43.797l8.186,21.257l32.302,18.886l-13.397-47.602    l-10.356-91.456l-33.469-1.377l-5.881-16.18c22.424-4.581,39.302-23.906,40.545-47.373l-100.75-13.359    c-0.736,3.442-1.157,7.009-1.157,10.672c0,17.681,8.989,33.258,22.644,42.429l-0.889-0.096l-20.167,16.954l-25.838-2.17L0,221.497    v75.477l45.059,11.131L38.384,420.339z M28.688,269.558v-22.539l19.125-17.471v44.313L28.688,269.558z M182.443,107.77l15.31,2.027c2.037-45.508-17.738-75.286-53.541-80.029c-2.936-0.392-5.843-0.583-8.721-0.583    c-31.709,0-54.784,23.208-63.82,63.896l13.34,1.769L182.443,107.77z', 'green']
+      ];
+
+      function setMarkers(map) {
+        // Adds markers to the map.
+
+        // Marker sizes are expressed as a Size of X,Y where the origin of the image
+        // (0,0) is located in the top left of the image.
+
+        // Origins, anchor positions and coordinates of the marker increase in the X
+        // direction to the right and in the Y direction down.
+        var image = {
+          url: 'images/icon-maps.png',
+          // This marker is 20 pixels wide by 32 pixels high.
+          size: new google.maps.Size(30, 30),
+          // The origin for this image is (0, 0).
+          origin: new google.maps.Point(0, 0),
+          // The anchor for this image is the base of the flagpole at (0, 32).
+          anchor: new google.maps.Point(0, 30)
+        };
+        // Shapes define the clickable region of the icon. The type defines an HTML
+        // <area> element 'poly' which traces out a polygon as a series of X,Y points.
+        // The final coordinate closes the poly by connecting to the first coordinate.
+        var shape = {
+          coords: [1, 1, 1, 35, 30, 35, 30, 1],
+          type: 'poly'
+        };
+        for (var i = 0; i < data.length; i++) {
+          var item = data[i];
+          var marker = new google.maps.Marker({
+            position: {lat: item[1], lng: item[2]},
+            map: map,
+            icon: {
+              path: item[8],
+              fillColor: item[9],
+              fillOpacity: 0.8,
+              scale: 0.075,
+              strokeColor: 'black',
+              strokeWeight: 0.8
+            },
+            shape: shape,
+            title: item[0],
+            zIndex: item[3]
+          });
+          var content = '<div id="content">'+
+                                '<div id="siteNotice">'+
+                                '</div>'+
+                                '<h1 id="firstHeading" class="firstHeading">'+item[0]+'</h1>'+
+                                '<div id="bodyContent">'+
+                                  '<p><b>Valor do Contrato:</b> R$ '+item[5]+'</p>'+
+                                  '<p><b>Empresa Vencedora:</b> '+item[6]+'</p>'+
+                                  '<p><b>Endereço:</b> '+item[4]+'</p>'+
+                                  '<button type="button" class="btn btn-info"><a href="'+item[7]+'">Mais detalhes</a></button>'+
+                                '</div>'+
+                              '</div>';
+          var infowindow = new google.maps.InfoWindow()
+
+          google.maps.event.addListener(marker,'click', (function(marker,content,infowindow){ 
+            return function() {
+               infowindow.setContent(content);
+               infowindow.open(map,marker);
+            };
+          })(marker,content,infowindow));
+        }
+      }
+      
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCkik8iE6aSgqxUMVbxupVi0F_G1nFHbd8&libraries=places&callback=initMap"></script>
+  </body>
+  
+</html>
